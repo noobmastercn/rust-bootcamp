@@ -3,6 +3,7 @@ use clap::Parser;
 use enum_dispatch::enum_dispatch;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
+use std::io::Write;
 
 use super::verify_file;
 
@@ -66,6 +67,9 @@ impl CmdExector for JwtSignOpts {
         // 从fixtures/jwt-secret.txt中读取密钥
         let mut secret_reader = get_reader("fixtures/jwt-secret.txt")?;
         let token = process_gen_jwt_token(&self, &mut secret_reader)?;
+        // 写入到文件
+        let mut token_writer = std::fs::File::create("fixtures/jwt-token.txt")?;
+        token_writer.write_all(token.as_bytes())?;
         println!("json web token: {}", token);
         Ok(())
     }

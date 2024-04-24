@@ -1,5 +1,6 @@
-use crate::JwtSignOpts;
 use std::io::Read;
+
+use crate::JwtSignOpts;
 
 pub fn process_gen_jwt_token(
     claims: &JwtSignOpts,
