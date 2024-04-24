@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.0/dist/tailwind.min.css" rel="stylesheet">
+    <title>目录索引</title>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+<div class="container mx-auto">
+    <h1 class="text-3xl font-bold my-6 text-center">目录索引：{{ path }}</h1>
+    <ul>
+        {% for file in files %}
+        <li class="mb-2">
+            <a href="{{ file.path }}" class="text-blue-500 hover:text-blue-800">{{ file.name }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+</body>
+</html>
