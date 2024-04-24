@@ -1,14 +1,16 @@
+use std::{fmt, path::PathBuf, str::FromStr};
+
+use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
+use clap::Parser;
+use enum_dispatch::enum_dispatch;
+use tokio::fs;
+
 use crate::{
     get_content, get_reader, process_text_decrypt, process_text_encrypt, process_text_key_generate,
     process_text_sign, process_text_verify, CmdExector,
 };
 
 use super::{verify_file, verify_path};
-use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
-use clap::Parser;
-use enum_dispatch::enum_dispatch;
-use std::{fmt, path::PathBuf, str::FromStr};
-use tokio::fs;
 
 #[derive(Debug, Parser)]
 #[enum_dispatch(CmdExector)]
@@ -180,10 +182,9 @@ impl CmdExector for TextDecryptOpts {
 
 #[cfg(test)]
 mod tests {
-
     use chacha20poly1305::{
         aead::{Aead, AeadCore, KeyInit, OsRng},
-        ChaCha20Poly1305, Key, Nonce,
+        ChaCha20Poly1305, Key,
     };
 
     #[test]
