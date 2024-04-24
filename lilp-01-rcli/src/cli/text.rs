@@ -1,6 +1,6 @@
 use crate::{
-    get_content, get_reader, process_text_key_generate, process_text_sign, process_text_verify,
-    CmdExector,
+    get_content, get_reader, process_text_decrypt, process_text_encrypt, process_text_key_generate,
+    process_text_sign, process_text_verify, CmdExector,
 };
 
 use super::{verify_file, verify_path};
@@ -19,10 +19,10 @@ pub enum TextSubCommand {
     Verify(TextVerifyOpts),
     #[command(about = "Generate a random blake3 key or ed25519 key pair")]
     Generate(KeyGenerateOpts),
-    // #[command(about = "Encrypt a text with a public key")]
-    // Encrypt(EncryptOpts),
-    // #[command(about = "Decrypt a text with a private key")]
-    // Decrypt(DecryptOpts),
+    #[command(about = "Encrypt a text with a public key")]
+    Encrypt(TextEncryptOpts),
+    #[command(about = "Decrypt a text with a private key")]
+    Decrypt(TextDecryptOpts),
 }
 
 #[derive(Debug, Parser)]
@@ -62,17 +62,21 @@ pub enum TextSignFormat {
 }
 
 #[derive(Debug, Parser)]
-pub struct EncryptOpts {
+pub struct TextEncryptOpts {
+    /// 输入需要加密的内容
     #[arg(short, long, value_parser = verify_file, default_value = "-")]
     pub input: String,
+    /// 输入密钥文件路径 32位
     #[arg(short, long, value_parser = verify_file)]
     pub key: String,
 }
 
 #[derive(Debug, Parser)]
-pub struct DecryptOpts {
+pub struct TextDecryptOpts {
+    /// 输入需要解密的内容路径
     #[arg(short, long, value_parser = verify_file, default_value = "-")]
     pub input: String,
+    /// 输入密钥文件路径
     #[arg(short, long, value_parser = verify_file)]
     pub key: String,
 }
@@ -141,6 +145,35 @@ impl CmdExector for KeyGenerateOpts {
         for (k, v) in key {
             fs::write(self.output_path.join(k), v).await?;
         }
+        Ok(())
+    }
+}
+
+impl CmdExector for TextEncryptOpts {
+    async fn execute(self) -> anyhow::Result<()> {
+        // 获取用户输入内容
+        let mut reader = get_reader(&self.input)?;
+        // 获取用户输入的key地址
+        let key = get_content(&self.key)?;
+        // encrypt
+        // let sig = process_text_sign(&mut reader, &key, self.format)?;
+        let ciphertext = process_text_encrypt(&mut reader, &key)?;
+        // base64 output
+        let encoded = URL_SAFE_NO_PAD.encode(ciphertext);
+        println!(" 加密文本： {}", encoded);
+        Ok(())
+    }
+}
+
+impl CmdExector for TextDecryptOpts {
+    async fn execute(self) -> anyhow::Result<()> {
+        // 获取用户输入内容
+        let mut reader = get_reader(&self.input)?;
+        // 获取用户输入的key地址
+        let key = get_content(&self.key)?;
+        // decrypt
+        let plaintext = process_text_decrypt(&mut reader, &key)?;
+        println!(" 解密文本：{}", String::from_utf8_lossy(&plaintext));
         Ok(())
     }
 }
