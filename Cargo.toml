@@ -1,5 +1,5 @@
 [workspace]
-members = ["lilp-01-rcli"]
+members = ["lilp-01-rcli", "lilp-02-concurrency", "lilp-02-simple-redis"]
 
 [package]
 name = "rust-bootcamp"
