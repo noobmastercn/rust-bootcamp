@@ -20,7 +20,7 @@ const CRLF_LEN: usize = CRLF.len();
 
 pub use self::{
     array::{RespArray, RespNullArray},
-    bulk_string::{BulkString, RespNullBulkString},
+    bulk_string::{BulkString /*RespNullBulkString*/},
     frame::RespFrame,
     map::RespMap,
     null::RespNull,
@@ -115,10 +115,18 @@ fn find_crlf(buf: &[u8], nth: usize) -> Option<usize> {
 fn parse_length(buf: &[u8], prefix: &str) -> Result<(usize, usize), RespError> {
     let end = extract_simple_frame_data(buf, prefix)?;
     let s = String::from_utf8_lossy(&buf[prefix.len()..end]);
+    let len = s.parse::<isize>()?;
+    if len < 0 {
+        return Ok((end, 0));
+    }
     Ok((end, s.parse()?))
 }
 
 fn calc_total_length(buf: &[u8], end: usize, len: usize, prefix: &str) -> Result<usize, RespError> {
+    // 如果 len < 0, 说明是null类型的，直接返回
+    if len < 0 {
+        return Ok(end + CRLF_LEN);
+    }
     let mut total = end + CRLF_LEN;
     let mut data = &buf[total..];
     match prefix {
@@ -145,7 +153,8 @@ fn calc_total_length(buf: &[u8], end: usize, len: usize, prefix: &str) -> Result
             }
             Ok(total)
         }
-        _ => Ok(len + CRLF_LEN),
+        // for other types, we just need to find the length of the data
+        _ => Ok(len as usize + CRLF_LEN),
     }
 }
 

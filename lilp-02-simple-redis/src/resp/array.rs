@@ -26,17 +26,22 @@ impl RespEncode for RespArray {
 
 // - array: "*<number-of-elements>\r\n<element-1>...<element-n>"
 // - "*2\r\n$3\r\nget\r\n$5\r\nhello\r\n"
+// 每个命令或数据帧都是以 \r\n （回车符后跟换行符）结束
 // FIXME: need to handle incomplete
 impl RespDecode for RespArray {
     const PREFIX: &'static str = "*";
     fn decode(buf: &mut BytesMut) -> Result<Self, RespError> {
+        println!("buf: {:?}", String::from_utf8_lossy(&buf));
         let (end, len) = parse_length(buf, Self::PREFIX)?;
         let total_len = calc_total_length(buf, end, len, Self::PREFIX)?;
+
+        println!("end: {}, len: {}, total_len: {}", end, len, total_len);
 
         if buf.len() < total_len {
             return Err(RespError::NotComplete);
         }
 
+        // 将缓冲区的游标向前推进，跳过已经解析完成的部分。
         buf.advance(end + CRLF_LEN);
 
         let mut frames = Vec::with_capacity(len);
@@ -135,9 +140,9 @@ mod tests {
         let ret = RespArray::decode(&mut buf);
         assert_eq!(ret.unwrap_err(), RespError::NotComplete);
 
-        buf.extend_from_slice(b"$5\r\nhello\r\n");
+        buf.extend_from_slice(b"$6\r\nhello!\r\n");
         let frame = RespArray::decode(&mut buf)?;
-        assert_eq!(frame, RespArray::new([b"set".into(), b"hello".into()]));
+        assert_eq!(frame, RespArray::new([b"set".into(), b"hello!".into()]));
 
         Ok(())
     }

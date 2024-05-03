@@ -25,8 +25,10 @@ impl RespEncode for SimpleString {
 impl RespDecode for SimpleString {
     const PREFIX: &'static str = "+";
     fn decode(buf: &mut BytesMut) -> Result<Self, RespError> {
+        // 例如： +OK\r\n  end = 3
         let end = extract_simple_frame_data(buf, Self::PREFIX)?;
-        // split the buffer
+        println!("=== SimpleString end: {}", end);
+        // split the buffer 截出第一片数据 +OK\r\n
         let data = buf.split_to(end + CRLF_LEN);
         let s = String::from_utf8_lossy(&data[Self::PREFIX.len()..end]);
         Ok(SimpleString::new(s.to_string()))
