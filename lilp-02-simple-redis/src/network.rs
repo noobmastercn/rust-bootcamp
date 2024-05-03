@@ -1,6 +1,6 @@
 use crate::{
     cmd::{Command, CommandExecutor},
-    Backend, RespDecode, RespEncode, RespError, RespFrame,
+    Backend, RespDecode, RespEncode, RespError, RespFrame, SimpleError,
 };
 use anyhow::Result;
 use futures::SinkExt;
@@ -46,10 +46,17 @@ pub async fn stream_handler(stream: TcpStream, backend: Backend) -> Result<()> {
 
 async fn request_handler(request: RedisRequest) -> Result<RedisResponse> {
     let (frame, backend) = (request.frame, request.backend);
-    let cmd = Command::try_from(frame)?;
-    info!("Executing command: {:?}", cmd);
-    let frame = cmd.execute(&backend);
-    Ok(RedisResponse { frame })
+
+    match Command::try_from(frame) {
+        Ok(cmd) => {
+            let response = cmd.execute(&backend);
+            Ok(RedisResponse { frame: response })
+        }
+        Err(e) => {
+            let response = SimpleError::new(e.to_string()).into();
+            Ok(RedisResponse { frame: response })
+        }
+    }
 }
 
 impl Encoder<RespFrame> for RespFrameCodec {
