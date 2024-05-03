@@ -5,7 +5,9 @@ use tracing::{info, warn};
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    tracing_subscriber::fmt::init();
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::INFO) // 设置日志级别为INFO
+        .init();
 
     let addr = "0.0.0.0:6379";
     info!("Simple-Redis-Server is listening on {}", addr);
