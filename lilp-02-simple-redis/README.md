@@ -10,7 +10,7 @@
 redis-cli
 
 echo lilpum
-echo lilpum
+echo "hello world~"
 
 hset lilp k1 v1
 hset lilp k2 v2
