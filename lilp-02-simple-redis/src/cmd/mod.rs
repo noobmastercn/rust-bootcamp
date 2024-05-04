@@ -1,8 +1,9 @@
 mod echo;
 mod hmap;
 mod map;
+mod set;
 
-use crate::{Backend, RespArray, RespError, RespFrame, SimpleString};
+use crate::{Backend, BulkString, RespArray, RespError, RespFrame, SimpleString};
 use enum_dispatch::enum_dispatch;
 use lazy_static::lazy_static;
 use thiserror::Error;
@@ -40,7 +41,8 @@ pub enum Command {
     HGetAll(HGetAll),
     HmGet(HmGet),
     Echo(Echo),
-
+    Sadd(Sadd),
+    Sismember(Sismember),
     // unrecognized command
     Unrecognized(Unrecognized),
 }
@@ -86,6 +88,18 @@ pub struct HmGet {
     fields: Vec<String>,
 }
 
+#[derive(Debug, Clone)]
+pub struct Sadd {
+    key: String,
+    members: Vec<BulkString>,
+}
+
+#[derive(Debug)]
+pub struct Sismember {
+    key: String,
+    member: BulkString,
+}
+
 #[derive(Debug)]
 pub struct Unrecognized;
 
@@ -114,6 +128,8 @@ impl TryFrom<RespArray> for Command {
                 b"hgetall" => Ok(HGetAll::try_from(v)?.into()),
                 b"hmget" => Ok(HmGet::try_from(v)?.into()),
                 b"echo" => Ok(Echo::try_from(v)?.into()),
+                b"sadd" => Ok(Sadd::try_from(v)?.into()),
+                b"sismember" => Ok(Sismember::try_from(v)?.into()),
                 _ => Ok(Unrecognized.into()),
             },
             _ => Err(CommandError::InvalidCommand(

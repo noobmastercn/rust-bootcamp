@@ -7,8 +7,8 @@ use super::{extract_simple_frame_data, CRLF_LEN};
 // - integer: ":[<+|->]<value>\r\n"
 impl RespEncode for i64 {
     fn encode(self) -> Vec<u8> {
-        let sign = if self < 0 { "" } else { "+" };
-        format!(":{}{}\r\n", sign, self).into_bytes()
+        // 不需要处理正负号 否则会出现错误 Error: Bad integer value
+        format!(":{}\r\n", self).into_bytes()
     }
 }
 
@@ -33,6 +33,18 @@ mod tests {
     use super::*;
     use crate::RespFrame;
     use anyhow::Result;
+
+    #[test]
+    fn test2_integer_encode() {
+        let frame: RespFrame = (-1).into();
+        println!("{:?}", String::from_utf8(frame.encode()));
+
+        let frame: RespFrame = 0.into();
+        println!("{:?}", String::from_utf8(frame.encode()));
+
+        let frame: RespFrame = 1.into();
+        println!("{:?}", String::from_utf8(frame.encode()));
+    }
 
     #[test]
     fn test_integer_encode() {

@@ -4,7 +4,7 @@ use bytes::{Buf, BytesMut};
 
 use crate::{RespDecode, RespEncode, RespError, RespFrame};
 
-use super::{calc_total_length, extract_fixed_data, parse_length, BUF_CAP, CRLF_LEN};
+use super::{calc_total_length, parse_length, BUF_CAP, CRLF_LEN};
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct RespArray(pub(crate) Option<Vec<RespFrame>>);
@@ -102,9 +102,11 @@ impl Deref for RespArray {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::BulkString;
     use anyhow::Result;
+
+    use crate::BulkString;
+
+    use super::*;
 
     #[test]
     fn test_array_encode() {
