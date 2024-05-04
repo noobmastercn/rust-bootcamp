@@ -109,6 +109,7 @@ fn find_crlf(buf: &[u8], nth: usize) -> Option<usize> {
 fn parse_length(buf: &[u8], prefix: &str) -> Result<(usize, usize), RespError> {
     let end = extract_simple_frame_data(buf, prefix)?;
     let s = String::from_utf8_lossy(&buf[prefix.len()..end]);
+    // for null array, the length is -1 and we need to return 0
     let len = s.parse::<isize>()?;
     if len < 0 {
         return Ok((end, 0));
@@ -157,6 +158,7 @@ mod tests {
     fn test_calc_array_length() -> Result<()> {
         let buf = b"*2\r\n$3\r\nset\r\n$5\r\nhello\r\n";
         let (end, len) = parse_length(buf, "*")?;
+        println!("end: {}, len: {}", end, len);
         let total_len = calc_total_length(buf, end, len, "*")?;
         assert_eq!(total_len, buf.len());
 

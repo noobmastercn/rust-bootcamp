@@ -40,9 +40,12 @@ impl RespDecode for RespArray {
     fn decode(buf: &mut BytesMut) -> Result<Self, RespError> {
         println!("buf: {:?}", String::from_utf8_lossy(&buf));
         let (end, len) = parse_length(buf, Self::PREFIX)?;
+        // 如果是空数组 null array: "*-1\r\n" parse_length 中匹配到长度为-1 len 返回值是0
+        if len == 0 {
+            buf.advance(end + CRLF_LEN);
+            return Ok(RespArray(None));
+        }
         let total_len = calc_total_length(buf, end, len, Self::PREFIX)?;
-
-        println!("end: {}, len: {}, total_len: {}", end, len, total_len);
 
         if buf.len() < total_len {
             return Err(RespError::NotComplete);
@@ -154,6 +157,10 @@ mod tests {
         buf.extend_from_slice(b"$6\r\nhello!\r\n");
         let frame = RespArray::decode(&mut buf)?;
         assert_eq!(frame, RespArray::new([b"set".into(), b"hello!".into()]));
+
+        buf.extend_from_slice(b"*-1\r\n");
+        let frame = RespArray::decode(&mut buf)?;
+        assert_eq!(frame, RespArray(None));
 
         Ok(())
     }
