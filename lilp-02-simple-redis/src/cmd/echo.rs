@@ -31,10 +31,10 @@ mod tests {
 
     #[test]
     fn test_echo() -> Result<()> {
-        let cmd = RespArray(vec![
+        let cmd = RespArray(Some(vec![
             RespFrame::BulkString(BulkString(Some(b"echo".to_vec()))),
             RespFrame::BulkString(BulkString(Some(b"hello world~".to_vec()))),
-        ]);
+        ]));
         let cmd = Echo::try_from(cmd)?;
         assert_eq!(cmd.msg, "hello world~");
 

@@ -62,4 +62,13 @@ impl Backend {
     pub fn hgetall(&self, key: &str) -> Option<DashMap<String, RespFrame>> {
         self.hmap.get(key).map(|v| v.clone())
     }
+
+    pub fn hmget(&self, key: &str, fields: &[String]) -> Option<Vec<Option<RespFrame>>> {
+        self.hmap.get(key).map(|v| {
+            fields
+                .iter()
+                .map(|f| v.get(f).map(|v| v.value().clone()))
+                .collect()
+        })
+    }
 }

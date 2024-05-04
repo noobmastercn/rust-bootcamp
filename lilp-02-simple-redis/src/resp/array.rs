@@ -7,7 +7,7 @@ use crate::{RespDecode, RespEncode, RespError, RespFrame};
 use super::{calc_total_length, extract_fixed_data, parse_length, BUF_CAP, CRLF_LEN};
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
-pub struct RespArray(pub(crate) Vec<RespFrame>);
+pub struct RespArray(pub(crate) Option<Vec<RespFrame>>);
 
 // #[derive(Debug, Clone, PartialEq, Eq, PartialOrd)]
 // pub struct RespNullArray;
@@ -16,9 +16,16 @@ pub struct RespArray(pub(crate) Vec<RespFrame>);
 impl RespEncode for RespArray {
     fn encode(self) -> Vec<u8> {
         let mut buf = Vec::with_capacity(BUF_CAP);
-        buf.extend_from_slice(&format!("*{}\r\n", self.0.len()).into_bytes());
-        for frame in self.0 {
-            buf.extend_from_slice(&frame.encode());
+        match self.0 {
+            Some(frames) => {
+                buf.extend_from_slice(&format!("*{}\r\n", frames.len()).into_bytes());
+                for frame in frames {
+                    buf.extend_from_slice(&frame.encode());
+                }
+            }
+            None => {
+                buf.extend_from_slice(b"*-1\r\n"); // RESP的空数组表示
+            }
         }
         buf
     }
@@ -79,7 +86,7 @@ impl RespDecode for RespArray {
 
 impl RespArray {
     pub fn new(s: impl Into<Vec<RespFrame>>) -> Self {
-        RespArray(s.into())
+        RespArray(Some(s.into()))
     }
 }
 
@@ -87,7 +94,9 @@ impl Deref for RespArray {
     type Target = Vec<RespFrame>;
 
     fn deref(&self) -> &Self::Target {
-        &self.0
+        // 静态空Vec<RespFrame>，供deref调用
+        static EMPTY_VEC: Vec<RespFrame> = Vec::new();
+        self.0.as_ref().unwrap_or(&EMPTY_VEC) // 安全返回Vec<RespFrame>引用
     }
 }
 

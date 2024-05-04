@@ -38,6 +38,7 @@ pub enum Command {
     HGet(HGet),
     HSet(HSet),
     HGetAll(HGetAll),
+    HmGet(HmGet),
     Echo(Echo),
 
     // unrecognized command
@@ -77,7 +78,12 @@ pub struct HGetAll {
 #[derive(Debug)]
 pub struct Echo {
     msg: String,
-    // value: RespFrame,
+}
+
+#[derive(Debug)]
+pub struct HmGet {
+    key: String,
+    fields: Vec<String>,
 }
 
 #[derive(Debug)]
@@ -106,6 +112,7 @@ impl TryFrom<RespArray> for Command {
                 b"hget" => Ok(HGet::try_from(v)?.into()),
                 b"hset" => Ok(HSet::try_from(v)?.into()),
                 b"hgetall" => Ok(HGetAll::try_from(v)?.into()),
+                b"hmget" => Ok(HmGet::try_from(v)?.into()),
                 b"echo" => Ok(Echo::try_from(v)?.into()),
                 _ => Ok(Unrecognized.into()),
             },
@@ -156,8 +163,25 @@ fn validate_command(
     Ok(())
 }
 
+// fn extract_args(value: RespArray, start: usize) -> Result<Vec<RespFrame>, CommandError> {
+//     Ok(value.0.into_iter().skip(start).collect::<Vec<RespFrame>>())
+// }
+
 fn extract_args(value: RespArray, start: usize) -> Result<Vec<RespFrame>, CommandError> {
-    Ok(value.0.into_iter().skip(start).collect::<Vec<RespFrame>>())
+    match value.0 {
+        Some(frames) => {
+            if frames.len() > start {
+                Ok(frames.into_iter().skip(start).collect::<Vec<RespFrame>>())
+            } else {
+                Err(CommandError::InvalidArgument(
+                    "Not enough arguments".to_string(),
+                ))
+            }
+        }
+        None => Err(CommandError::InvalidArgument(
+            "No arguments provided".to_string(),
+        )),
+    }
 }
 
 #[cfg(test)]
