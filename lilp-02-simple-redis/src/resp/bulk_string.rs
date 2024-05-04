@@ -4,7 +4,7 @@ use bytes::{Buf, BytesMut};
 
 use crate::{RespDecode, RespEncode, RespError};
 
-use super::{extract_fixed_data, parse_length, CRLF_LEN};
+use super::{parse_length, CRLF_LEN};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Hash)]
 pub struct BulkString(pub(crate) Option<Vec<u8>>);
@@ -129,10 +129,11 @@ impl<const N: usize> From<&[u8; N]> for BulkString {
 
 #[cfg(test)]
 mod tests {
+    use anyhow::Result;
+
     use crate::RespFrame;
 
     use super::*;
-    use anyhow::Result;
 
     #[test]
     fn test_bulk_string_encode() {

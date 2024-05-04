@@ -117,10 +117,6 @@ fn parse_length(buf: &[u8], prefix: &str) -> Result<(usize, usize), RespError> {
 }
 
 fn calc_total_length(buf: &[u8], end: usize, len: usize, prefix: &str) -> Result<usize, RespError> {
-    // 如果 len < 0, 说明是null类型的，直接返回
-    if len < 0 {
-        return Ok(end + CRLF_LEN);
-    }
     let mut total = end + CRLF_LEN;
     let mut data = &buf[total..];
     match prefix {

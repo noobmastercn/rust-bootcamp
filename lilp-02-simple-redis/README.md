@@ -7,7 +7,7 @@
  cargo run
  redis-cli
 ```
-```redis
+```redis-cli
 echo lilpum
 echo "hello world~"
 

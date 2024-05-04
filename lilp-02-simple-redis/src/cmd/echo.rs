@@ -1,5 +1,5 @@
 use crate::cmd::{extract_args, validate_command, CommandError, CommandExecutor, Echo};
-use crate::{Backend, BulkString, RespArray, RespFrame, SimpleString};
+use crate::{Backend, BulkString, RespArray, RespFrame};
 
 impl CommandExecutor for Echo {
     fn execute(self, _backend: &Backend) -> RespFrame {
@@ -24,10 +24,12 @@ impl TryFrom<RespArray> for Echo {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::RespDecode;
     use anyhow::Result;
     use bytes::BytesMut;
+
+    use crate::RespDecode;
+
+    use super::*;
 
     #[test]
     fn test_echo() -> Result<()> {
