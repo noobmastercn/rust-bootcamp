@@ -1,5 +1,5 @@
 [workspace]
-members = ["lilp-01-rcli", "lilp-02-concurrency", "lilp-02-simple-redis"]
+members = ["lilp-01-rcli", "lilp-02-concurrency", "lilp-02-simple-redis", "lilp-03_error_info/error-code", "lilp-03_error_info/error-code-derive", "lilp-03_macros"]
 
 [package]
 name = "rust-bootcamp"
@@ -16,6 +16,10 @@ strip = true
 
 [workspace.dependencies]
 anyhow = "1"
+error-code = { path = "lilp-03_error_info/error-code" }
+error-code-derive = { path = "lilp-03_error_info/error-code-derive" }
+http = "1"
+thiserror = "1"
 
 [dependencies]
 anyhow = { workspace = true }
