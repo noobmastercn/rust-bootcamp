@@ -1,5 +1,5 @@
 [workspace]
-members = ["lilp-01-rcli", "lilp-02-concurrency", "lilp-02-simple-redis", "lilp-03_error_info/error-code", "lilp-03_error_info/error-code-derive", "lilp-03_macros"]
+members = ["lilp-01-rcli", "lilp-02-concurrency", "lilp-02-simple-redis", "lilp-03_error_info/error-code", "lilp-03_error_info/error-code-derive", "lilp-03_macros", "lilp-04-ecosystem"]
 
 [package]
 name = "rust-bootcamp"
