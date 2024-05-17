@@ -4,6 +4,7 @@
 extend-exclude = [
     "CHANGELOG.md",
     "notebooks/*",
+    "docs/*",
     "**/*.excalidraw", # 排除所有 .excalidraw 后缀的文件
     "**/fixtures/**" # 排除所有目录下的 fixtures 文件夹及其子内容
 ]
