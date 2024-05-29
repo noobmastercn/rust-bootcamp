@@ -5,7 +5,7 @@
 //! - `shorten`: 将给定的URL缩短，并将其存储到数据库中。
 //!
 //! 此模块还包含了`UrlRecord`结构体，用于表示数据库中的URL记录。
-
+#[cfg(not(test))]
 use nanoid::nanoid;
 use sqlx::FromRow;
 
@@ -89,11 +89,10 @@ mod pgsql_tests {
     use super::*;
 
     /// 测试shorten函数
-    #[ignore]
     #[tokio::test]
     async fn test_shorten() -> anyhow::Result<()> {
         let url = "https://www.rust-lang.org/3";
-        let id = shorten(url).await?;
+        let _id = shorten(url).await?;
         Ok(())
     }
 }

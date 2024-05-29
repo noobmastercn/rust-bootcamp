@@ -5,7 +5,6 @@
 //! - 在数据库中创建必要的表（例如：`urls` 表）。
 //! - 提供异步函数 `get_pgsql_pool` 来获取数据库连接池。
 
-use nanoid::nanoid;
 use sqlx::{postgres, PgPool, Pool, Postgres};
 use tokio::sync::OnceCell;
 use tokio_postgres::{Client, NoTls};
@@ -149,7 +148,7 @@ mod pgsql_tests {
     #[ignore]
     #[tokio::test]
     async fn test_pgsql_pool() -> anyhow::Result<()> {
-        let conn = get_pgsql_pool().await;
+        let _conn = get_pgsql_pool().await;
         Ok(())
     }
 }
