@@ -1,5 +1,5 @@
 [workspace]
-members = ["lilp-01-rcli", "lilp-02-concurrency", "lilp-02-simple-redis", "lilp-03_error_info/error-code", "lilp-03_error_info/error-code-derive", "lilp-03_macros", "lilp-04-ecosystem"]
+members = ["lilp-01-rcli", "lilp-02-concurrency", "lilp-02-simple-redis", "lilp-03_error_info/error-code", "lilp-03_error_info/error-code-derive", "lilp-03_macros", "lilp-04-ecosystem", "lilp-05-chat/chat_core", "lilp-05-chat/chat_server", "lilp-05-chat/chat_test", "lilp-05-chat/notify_server"]
 
 [package]
 name = "rust-bootcamp"
@@ -20,6 +20,38 @@ error-code = { path = "lilp-03_error_info/error-code" }
 error-code-derive = { path = "lilp-03_error_info/error-code-derive" }
 http = "1"
 thiserror = "1"
+
+axum = { version = "0.7.5", features = [
+    "http2",
+    "query",
+    "tracing",
+    "multipart",
+    # "macros",
+] }
+
+axum-extra = { version = "0.9.3", features = ["typed-header"] }
+chrono = { version = "0.4.38", features = ["serde"] }
+chat-core = { path = "lilp-05-chat/chat_core" }
+chat-server = { path = "lilp-05-chat/chat_server" }
+jwt-simple = "0.12.9"
+notify-server = { path = "lilp-05-chat/notify_server" }
+serde = { version = "1.0.198", features = ["derive"] }
+serde_yaml = "0.9.34"
+sqlx = { version = "0.7.4", features = [
+    "chrono",
+    "postgres",
+    "runtime-tokio",
+    "tls-rustls",
+] }
+tokio = { version = "1.37.0", features = ["rt", "rt-multi-thread", "macros"] }
+tower = "0.4.13"
+tower-http = { version = "0.5.2", features = [
+    "compression-full",
+    "fs",
+    "trace",
+] }
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 
 [dependencies]
 anyhow = { workspace = true }
