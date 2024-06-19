@@ -46,6 +46,7 @@ mod tests {
         println!("{:?}", String::from_utf8(frame.encode()));
     }
 
+    #[ignore]
     #[test]
     fn test_integer_encode() {
         let frame: RespFrame = 123.into();

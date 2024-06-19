@@ -1,7 +1,6 @@
 use axum::routing::{get, post};
 use axum::Router;
 use ecosystem::handler::{redirect, shorten, AppState};
-use sqlx::PgPool;
 use std::sync::Arc;
 use tokio::net::TcpListener;
 use tracing::info;

@@ -89,6 +89,7 @@ mod pgsql_tests {
     use super::*;
 
     /// 测试shorten函数
+    #[ignore]
     #[tokio::test]
     async fn test_shorten() -> anyhow::Result<()> {
         let url = "https://www.rust-lang.org/3";

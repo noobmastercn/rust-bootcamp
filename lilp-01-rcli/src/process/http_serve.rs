@@ -1,3 +1,5 @@
+use std::{net::SocketAddr, path::PathBuf, sync::Arc};
+
 use anyhow::Result;
 use askama_axum::Template;
 use axum::response::{Html, IntoResponse};
@@ -7,7 +9,6 @@ use axum::{
     routing::get,
     Router,
 };
-use std::{net::SocketAddr, path::PathBuf, sync::Arc};
 use tokio::fs;
 use tower_http::services::ServeDir;
 use tracing::{info, warn};
@@ -130,6 +131,12 @@ async fn file_handler(
 
 #[cfg(test)]
 mod tests {
+    use axum::body::Body;
+    use axum::http::{Request, StatusCode};
+    // for `app.oneshot()`
+    use http_body_util::BodyExt;
+    use tower::ServiceExt;
+
     use super::*;
 
     #[tokio::test]
@@ -137,8 +144,25 @@ mod tests {
         let state = Arc::new(HttpServeState {
             path: PathBuf::from("."),
         });
-        let (status, content) = file_handler(State(state), Path("Cargo.toml".to_string())).await;
-        assert_eq!(status, StatusCode::OK);
-        assert!(content.trim().starts_with("[package]"));
+        let app = Router::new()
+            .route("/*path", get(file_handler))
+            .with_state(state.clone());
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/Cargo.toml")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let collected = response.collect().await.unwrap();
+        let body = collected.to_bytes();
+        let body = String::from_utf8_lossy(&body);
+        println!("body: {}", body);
+        assert!(body.contains("[package]"));
     }
 }

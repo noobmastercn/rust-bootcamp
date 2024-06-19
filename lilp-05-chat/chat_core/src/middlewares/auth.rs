@@ -90,8 +90,8 @@ mod tests {
 
     #[tokio::test]
     async fn verify_token_middleware_should_work() -> Result<()> {
-        let encoding_pem = include_str!("../../fixtures/encoding.pem");
-        let decoding_pem = include_str!("../../fixtures/decoding.pem");
+        let encoding_pem = include_str!("../../fixtures/encoding.pem.test");
+        let decoding_pem = include_str!("../../fixtures/decoding.pem.test");
         let ek = EncodingKey::load(encoding_pem)?;
         let dk = DecodingKey::load(decoding_pem)?;
         let state = AppState(Arc::new(AppStateInner { ek, dk }));

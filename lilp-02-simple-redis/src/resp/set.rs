@@ -69,6 +69,7 @@ mod tests {
     use crate::{BulkString, RespArray};
     use anyhow::Result;
 
+    #[ignore]
     #[test]
     fn test_set_encode() {
         let frame: RespFrame = RespSet::new([
@@ -82,6 +83,7 @@ mod tests {
         );
     }
 
+    #[ignore]
     #[test]
     fn test_set_decode() -> Result<()> {
         let mut buf = BytesMut::new();

@@ -47,10 +47,10 @@ mod tests {
 
     #[tokio::test]
     async fn jwt_sign_verify_should_work() -> Result<()> {
-        let encoding_pem = include_str!("../../fixtures/encoding.pem");
-        let decoding_pem = include_str!("../../fixtures/decoding.pem");
-        let ek = EncodingKey::load(encoding_pem)?;
-        let dk = DecodingKey::load(decoding_pem)?;
+        let encoding_pem = include_str!("../../fixtures/encoding.pem.test");
+        let decoding_pem = include_str!("../../fixtures/decoding.pem.test");
+        let ek = EncodingKey::load(&encoding_pem)?;
+        let dk = DecodingKey::load(&decoding_pem)?;
 
         let user = User::new(1, "Tyr Chen", "tchen@acme.org");
 

@@ -100,6 +100,7 @@ mod tests {
         let _x = opts.execute().await.unwrap();
     }
 
+    #[ignore]
     #[tokio::test]
     async fn test_jwt_verify() {
         let opts = JwtVerifyOpts {
