@@ -9,7 +9,7 @@ use uuid::Uuid;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let pem = include_str!("../../fixtures/rootCA.pem");
+    let pem = include_str!("../../fixtures/rootCA.pem1");
     let tls = ClientTlsConfig::new()
         .ca_certificate(Certificate::from_pem(pem))
         .domain_name("localhost");
