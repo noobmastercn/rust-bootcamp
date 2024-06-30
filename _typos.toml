@@ -8,4 +8,5 @@ extend-exclude = [
     "**/*.excalidraw", # 排除所有 .excalidraw 后缀的文件
     "**/fixtures/**", # 排除所有目录下的 fixtures 文件夹及其子内容
     "lilp-05-chat/notify_server/*.html",
+    "lilp-06-crm/crm/crm.yml",
 ]
