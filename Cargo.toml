@@ -3,7 +3,7 @@ members = ["lilp-01-rcli", "lilp-02-concurrency", "lilp-02-simple-redis",
     "lilp-03_error_info/error-code", "lilp-03_error_info/error-code-derive", "lilp-03_macros",
     "lilp-04-ecosystem",
     "lilp-05-chat/chat_core", "lilp-05-chat/chat_server", "lilp-05-chat/chat_test", "lilp-05-chat/notify_server",
-    "lilp-06-crm/crm", "lilp-06-crm/crm-metadata", "lilp-06-crm/crm-send","lilp-06-crm/user-stat",
+    "lilp-06-crm/crm", "lilp-06-crm/crm-metadata", "lilp-06-crm/crm-send","lilp-06-crm/user-stat", "lilp-07-taotie",
 ]
 resolver = "2"
 
