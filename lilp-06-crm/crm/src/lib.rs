@@ -43,6 +43,7 @@ impl Crm for CrmService {
         &self,
         _request: Request<RecallRequest>,
     ) -> Result<Response<RecallResponse>, Status> {
+        // 作业
         todo!()
     }
 
@@ -50,6 +51,7 @@ impl Crm for CrmService {
         &self,
         _request: Request<RemindRequest>,
     ) -> Result<Response<RemindResponse>, Status> {
+        // 作业
         todo!()
     }
 }
