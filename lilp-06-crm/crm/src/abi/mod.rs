@@ -1,5 +1,6 @@
 pub mod auth;
 
+use crate::pb::{RecallRequest, RecallResponse, RemindRequest, RemindResponse};
 use crate::{
     pb::{WelcomeRequest, WelcomeResponse},
     CrmService,
@@ -67,5 +68,99 @@ impl CrmService {
         self.notification.clone().send(reqs).await?;
 
         Ok(Response::new(WelcomeResponse { id: request_id }))
+    }
+
+    pub async fn recall(&self, req: RecallRequest) -> Result<Response<RecallResponse>, Status> {
+        let request_id = req.id.clone();
+        let d1 = Utc::now() - Duration::days(req.last_visit_interval as _);
+        let d2 = Utc::now();
+        let query = QueryRequest::new_with_dt("last_visit", d1, d2);
+        let mut res_user_stats = self.user_stats.clone().query(query).await?.into_inner();
+
+        let contents = self
+            .metadata
+            .clone()
+            .materialize(MaterializeRequest::new_with_ids(&req.content_ids))
+            .await?
+            .into_inner();
+
+        let contents: Vec<Content> = contents
+            .filter_map(|v| async move { v.ok() })
+            .collect()
+            .await;
+        let contents = Arc::new(contents);
+
+        let (tx, rx) = mpsc::channel(1024);
+
+        let sender = self.config.server.sender_email.clone();
+        tokio::spawn(async move {
+            while let Some(Ok(user)) = res_user_stats.next().await {
+                let contents = contents.clone();
+                let sender = sender.clone();
+                let tx = tx.clone();
+
+                let req = SendRequest::new(
+                    "Recall Reminder".to_string(),
+                    sender,
+                    &[user.email],
+                    &contents,
+                );
+                if let Err(e) = tx.send(req).await {
+                    warn!("Failed to send message: {:?}", e);
+                }
+            }
+        });
+        let reqs = ReceiverStream::new(rx);
+
+        self.notification.clone().send(reqs).await?;
+
+        Ok(Response::new(RecallResponse { id: request_id }))
+    }
+
+    pub async fn remind(&self, req: RemindRequest) -> Result<Response<RemindResponse>, Status> {
+        let request_id = req.id.clone();
+        let d1 = Utc::now() - Duration::days(req.last_visit_interval as _);
+        let d2 = Utc::now();
+        let query = QueryRequest::new_with_dt("last_visit", d1, d2);
+        let mut res_user_stats = self.user_stats.clone().query(query).await?.into_inner();
+
+        let contents = self
+            .metadata
+            .clone()
+            .materialize(MaterializeRequest::new_with_ids(&vec![]))
+            .await?
+            .into_inner();
+
+        let contents: Vec<Content> = contents
+            .filter_map(|v| async move { v.ok() })
+            .collect()
+            .await;
+        let contents = Arc::new(contents);
+
+        let (tx, rx) = mpsc::channel(1024);
+
+        let sender = self.config.server.sender_email.clone();
+        tokio::spawn(async move {
+            while let Some(Ok(user)) = res_user_stats.next().await {
+                let contents = contents.clone();
+                let sender = sender.clone();
+                let tx = tx.clone();
+
+                let req = SendRequest::new(
+                    "Remind Notification".to_string(),
+                    sender,
+                    &[user.email],
+                    &contents,
+                );
+                if let Err(e) = tx.send(req).await {
+                    warn!("Failed to send message: {:?}", e);
+                }
+            }
+        });
+        let reqs = ReceiverStream::new(rx);
+
+        self.notification.clone().send(reqs).await?;
+
+        Ok(Response::new(RemindResponse { id: request_id }))
     }
 }
