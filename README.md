@@ -55,7 +55,7 @@ pipx install pre-commit
 Cargo deny 是一个 Cargo 插件，可以用于检查依赖的安全性。
 
 ```bash
-cargo install --locked cargo-deny
+cargo install --locked cargo-deny && cargo deny init && cargo deny check
 ```
 
 ### 安装 typos
